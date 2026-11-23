@@ -106,6 +106,11 @@ body.intro-active { overflow: hidden; }
 .intro-scene-status { min-height: 3.7em; margin: 14px 0 10px; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
 .intro-secondary { min-height: 44px; padding: 8px 12px; background: transparent; border: 0; border-bottom: 1px dotted #bd916c; border-radius: 0; color: #9a7457; font-size: .875rem; font-weight: 500; }
 .intro-microphone-note { font-size: .8125rem; margin-top: 13px; color: #9a806a; }
+.intro-breath-slot { height: 18px; display: grid; place-items: center; }
+.intro-breath-meter { width: 132px; height: 5px; overflow: hidden; background: #ead9c2; border-radius: 999px; }
+.intro-breath-meter > span { display: block; width: 0; height: 100%; border-radius: inherit; background: #ad652e; transition: width .06s linear; }
+.intro-scene-status[data-mic-state="waiting"], .intro-scene-status[data-mic-state="listening"] { color: #885126; font-weight: 650; }
+.intro-scene-status[data-mic-state="unsupported"], .intro-scene-status[data-mic-state="error"] { color: #9e411b; font-weight: 650; }
 .intro-gift-art { --tear: 0; --tear-percent: 0%; width: min(320px, 80vw); height: 310px; margin: 30px auto 16px; transform-style: preserve-3d; transform: perspective(900px) rotateX(var(--view-x, 0deg)) rotateY(var(--view-y, 0deg)); transition: transform .16s ease-out; user-select: none; -webkit-user-select: none; }
 .intro-gift-core { position: absolute; inset: 65px 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9d4819; font-size: 1.2rem; font-weight: 800; border-radius: 24px; background: #ffe4ac; box-shadow: 0 0 50px #ffcd6b66; }
 .intro-gift-core img { width: 140px; height: auto; }

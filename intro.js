@@ -10,6 +10,8 @@
   const cakeStatus = document.getElementById("intro-cake-status");
   const blowButton = document.getElementById("intro-blow");
   const microphoneButton = document.getElementById("intro-microphone");
+  const breathMeter = document.getElementById("intro-breath-meter");
+  const breathLevel = document.getElementById("intro-breath-level");
   const giftStep = document.getElementById("intro-gift-step");
   const giftArt = document.getElementById("intro-gift-art");
   const giftStatus = document.getElementById("intro-gift-status");
@@ -30,6 +32,8 @@
   let microphonePending = false;
   let microphoneGeneration = 0;
   let microphoneTimer = null;
+  let microphoneStartupTimer = null;
+  let microphoneResumeCancel = null;
   let microphoneFrame = null;
   let microphoneStream = null;
   let microphoneContext = null;
@@ -47,11 +51,16 @@
   }
 
   function stopMicrophone() {
+    const wasActive = microphonePending || Boolean(microphoneStream) || Boolean(microphoneContext);
     microphoneGeneration += 1;
     microphonePending = false;
     window.clearTimeout(microphoneTimer);
+    window.clearTimeout(microphoneStartupTimer);
+    if (microphoneResumeCancel) microphoneResumeCancel();
+    microphoneResumeCancel = null;
     window.cancelAnimationFrame(microphoneFrame);
     microphoneTimer = null;
+    microphoneStartupTimer = null;
     microphoneFrame = null;
     if (microphoneStream) microphoneStream.getTracks().forEach(track => track.stop());
     microphoneStream = null;
@@ -61,9 +70,59 @@
     microphoneSource = null;
     const oldContext = microphoneContext;
     microphoneContext = null;
-    if (oldContext && oldContext.state !== "closed") oldContext.close().catch(() => {});
+    closeMicrophoneContext(oldContext);
     microphoneButton.disabled = stage !== "candle";
-    microphoneButton.textContent = "对着手机吹";
+    if (wasActive || stage !== "candle") {
+      microphoneButton.textContent = "对着手机吹";
+      cakeStatus.removeAttribute("data-mic-state");
+    }
+    if (breathMeter) breathMeter.hidden = true;
+    updateBreathMeter(0);
+  }
+
+  function closeMicrophoneContext(context) {
+    if (!context || context.state === "closed") return;
+    try { Promise.resolve(context.close()).catch(() => {}); } catch (_) {}
+  }
+
+  function updateBreathMeter(value) {
+    const percent = Math.round(Math.max(0, Math.min(1, value)) * 100);
+    if (breathMeter) {
+      breathMeter.setAttribute("aria-valuenow", String(percent));
+      breathMeter.style.setProperty("--breath-level", String(percent / 100));
+    }
+    if (breathLevel) breathLevel.style.width = `${percent}%`;
+    cakeArt.style.setProperty("--breath-level", String(percent / 100));
+  }
+
+  function microphoneStatus(state, message, buttonLabel) {
+    cakeStatus.setAttribute("data-mic-state", state);
+    if (cakeStatus.textContent !== message) cakeStatus.textContent = message;
+    if (buttonLabel) microphoneButton.textContent = buttonLabel;
+  }
+
+  function microphoneFailure(message, buttonLabel = "重新尝试") {
+    stopMicrophone();
+    if (stage === "candle") microphoneStatus("error", message, buttonLabel);
+  }
+
+  function waitForMicrophoneContext(context, ready) {
+    if (context.state === "running") return Promise.resolve(true);
+    return new Promise(resolve => {
+      let settled = false;
+      let timeout = null;
+      const finish = running => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeout);
+        if (microphoneResumeCancel === cancel) microphoneResumeCancel = null;
+        resolve(running);
+      };
+      const cancel = () => finish(false);
+      microphoneResumeCancel = cancel;
+      timeout = window.setTimeout(cancel, 1800);
+      ready.then(running => finish(running && context.state === "running"));
+    });
   }
 
   function positionFortune() {
@@ -231,76 +290,136 @@
 
   async function startMicrophone() {
     if (stage !== "candle" || microphonePending || microphoneStream) return;
+    microphoneStatus("waiting", "正在开启吹气感应,请允许使用麦克风.", "正在开启...");
     const Context = window.AudioContext || window.webkitAudioContext;
-    if (!navigator.mediaDevices?.getUserMedia || !Context) {
-      cakeStatus.textContent = "这次用手指轻轻点一下,也能把蜡烛吹灭.";
+    const modernMedia = navigator.mediaDevices?.getUserMedia;
+    const legacyMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    if ((!modernMedia && !legacyMedia) || !Context) {
+      const inWeChat = /MicroMessenger/i.test(navigator.userAgent || "");
+      microphoneStatus("unsupported", inWeChat
+        ? "当前微信未开放吹气感应,可以点蜡烛吹灭."
+        : "当前浏览器暂不支持吹气感应,可以点蜡烛吹灭.", "吹气暂不可用");
       return;
     }
     microphonePending = true;
     const attempt = ++microphoneGeneration;
     microphoneButton.disabled = true;
-    microphoneButton.textContent = "等待麦克风...";
-    cakeStatus.textContent = "允许使用麦克风后,对着手机轻轻吹一口气.";
-    microphoneTimer = window.setTimeout(() => {
+    microphoneStartupTimer = window.setTimeout(() => {
       if (attempt !== microphoneGeneration) return;
-      stopMicrophone();
-      if (stage === "candle") cakeStatus.textContent = "也可以点一下吹灭蜡烛,愿望一样算数.";
-    }, 12000);
+      microphoneFailure("麦克风还没准备好,可以重新尝试,或点蜡烛吹灭.");
+    }, 20000);
 
     // Silence the birthday melody while sensing breath so speaker sound cannot trigger it.
     window.BirthdayMusic?.pauseForMic();
+    let detectionContext;
+    let localStream = null;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: false, autoGainControl: false } });
+      // Both calls happen synchronously in the original click, before any permission await.
+      detectionContext = new Context();
+      microphoneContext = detectionContext;
+      const resumed = typeof detectionContext.resume === "function" ? detectionContext.resume() : undefined;
+      const contextReady = Promise.resolve(resumed).then(
+        () => detectionContext.state === "running", () => false
+      );
+      const constraints = { audio: { echoCancellation: true, noiseSuppression: false, autoGainControl: false } };
+      const permission = modernMedia
+        ? modernMedia.call(navigator.mediaDevices, constraints)
+        : new Promise((resolve, reject) => legacyMedia.call(navigator, constraints, resolve, reject));
+      const stream = await permission;
+      localStream = stream;
       if (attempt !== microphoneGeneration || stage !== "candle" || document.hidden) {
         stream.getTracks().forEach(track => track.stop());
+        closeMicrophoneContext(detectionContext);
         return;
       }
       microphoneStream = stream;
-      const detectionContext = new Context();
-      microphoneContext = detectionContext;
-      await detectionContext.resume();
+      const running = await waitForMicrophoneContext(detectionContext, contextReady);
       if (attempt !== microphoneGeneration || stage !== "candle" || document.hidden) {
         stream.getTracks().forEach(track => track.stop());
         if (microphoneContext === detectionContext) stopMicrophone();
-        else if (detectionContext.state !== "closed") detectionContext.close().catch(() => {});
+        else closeMicrophoneContext(detectionContext);
+        return;
+      }
+      if (!running || detectionContext.state !== "running") {
+        microphoneFailure("声音感应还没启动,请再点一下.也可以点蜡烛吹灭.", "再点一下启动");
+        return;
+      }
+      if (typeof stream.getAudioTracks === "function" && stream.getAudioTracks().length === 0) {
+        microphoneFailure("没找到可用的麦克风,可以点蜡烛吹灭.");
         return;
       }
       const analyser = detectionContext.createAnalyser();
       analyser.fftSize = 1024;
       microphoneSource = detectionContext.createMediaStreamSource(stream);
       microphoneSource.connect(analyser);
-      const samples = new Uint8Array(analyser.fftSize);
-      const calibrationStart = performance.now();
-      let calibrationTotal = 0;
-      let calibrationFrames = 0;
-      let loudStart = null;
+      // A silent output keeps the capture graph active in WebViews without microphone feedback.
+      if (typeof detectionContext.createGain === "function" && typeof analyser.connect === "function") {
+        const silentOutput = detectionContext.createGain();
+        silentOutput.gain.value = 0;
+        analyser.connect(silentOutput);
+        silentOutput.connect(detectionContext.destination);
+      }
+      const useFloatSamples = typeof analyser.getFloatTimeDomainData === "function";
+      const samples = useFloatSamples ? new Float32Array(analyser.fftSize) : new Uint8Array(analyser.fftSize);
+      let noiseFloor = .003;
+      let evidenceMs = 0;
+      let previousFrame = null;
+      let receivedSound = false;
+      const listeningStart = performance.now();
+      window.clearTimeout(microphoneStartupTimer);
+      microphoneStartupTimer = null;
+      microphoneTimer = window.setTimeout(() => {
+        if (attempt !== microphoneGeneration) return;
+        microphoneFailure("还没听到足够的声音,靠近手机再试一次,或点蜡烛吹灭.");
+      }, 12000);
       microphoneButton.textContent = "正在听你的愿望...";
-      cakeStatus.textContent = "现在对着手机轻轻吹一口气吧.";
+      microphoneStatus("listening", "吹气感应已准备好,对着手机轻轻吹一口气.");
+      if (breathMeter) breathMeter.hidden = false;
+      updateBreathMeter(0);
       function listen(now) {
         if (attempt !== microphoneGeneration || stage !== "candle") return;
-        analyser.getByteTimeDomainData(samples);
-        const rms = Math.sqrt(samples.reduce((total, value) => total + ((value - 128) / 128) ** 2, 0) / samples.length);
-        if (now - calibrationStart < 500) {
-          calibrationTotal += rms;
-          calibrationFrames += 1;
-        } else {
-          const baseline = calibrationFrames ? calibrationTotal / calibrationFrames : 0;
-          const threshold = Math.max(.045, baseline * 2.4);
-          if (rms > threshold) {
-            if (loudStart === null) loudStart = now;
-            if (now - loudStart >= 220) {
-              extinguish(true);
-              return;
-            }
-          } else loudStart = null;
+        if (detectionContext.state !== "running") {
+          microphoneFailure("声音感应暂停了,请再点一下.也可以点蜡烛吹灭.", "再点一下启动");
+          return;
+        }
+        if (useFloatSamples) analyser.getFloatTimeDomainData(samples);
+        else analyser.getByteTimeDomainData(samples);
+        const rms = Math.sqrt(samples.reduce((total, value) => {
+          const amplitude = useFloatSamples ? value : (value - 128) / 128;
+          return total + amplitude * amplitude;
+        }, 0) / samples.length);
+        const elapsed = previousFrame === null ? 16 : Math.max(0, Math.min(60, now - previousFrame));
+        previousFrame = now;
+        // Learn low-energy input immediately; high-energy frames cannot raise the baseline.
+        if (rms <= .02) noiseFloor = Math.min(.01, noiseFloor * .65 + rms * .35);
+        const threshold = Math.max(.012, noiseFloor * 1.8 + .004);
+        evidenceMs = Math.max(0, evidenceMs + (rms > threshold ? elapsed : -elapsed * .7));
+        updateBreathMeter(rms / .065);
+        if (rms > .004 && !receivedSound) {
+          receivedSound = true;
+          microphoneStatus("listening", "已收到声音,继续对着手机轻轻吹一口气.");
+        } else if (!receivedSound && now - listeningStart > 1500) {
+          microphoneStatus("listening", "还没听到声音,靠近手机的麦克风轻轻吹一口气.");
+        }
+        if (evidenceMs >= 180) {
+          extinguish(true);
+          return;
         }
         microphoneFrame = window.requestAnimationFrame(listen);
       }
       microphoneFrame = window.requestAnimationFrame(listen);
-    } catch (_) {
-      if (attempt !== microphoneGeneration) return;
-      stopMicrophone();
-      if (stage === "candle") cakeStatus.textContent = "这次用手指轻轻点一下,也能把蜡烛吹灭.";
+    } catch (error) {
+      if (attempt !== microphoneGeneration) {
+        if (localStream) localStream.getTracks().forEach(track => track.stop());
+        closeMicrophoneContext(detectionContext);
+        return;
+      }
+      const message = error?.name === "NotAllowedError" || error?.name === "PermissionDeniedError"
+        ? "没有获得麦克风权限,请允许后重新尝试,也可以点蜡烛吹灭."
+        : error?.name === "NotFoundError" || error?.name === "DevicesNotFoundError"
+          ? "没找到可用的麦克风,可以点蜡烛吹灭."
+          : "麦克风暂时没有准备好,可以重新尝试,或点蜡烛吹灭.";
+      microphoneFailure(message);
     }
   }
 
@@ -322,7 +441,7 @@
       releaseTearPointer();
       const wasListening = microphonePending || Boolean(microphoneStream);
       stopMicrophone();
-      if (wasListening && stage === "candle") cakeStatus.textContent = "吹气感应已暂停,也可以点一下吹灭蜡烛.";
+      if (wasListening && stage === "candle") microphoneStatus("error", "吹气感应已暂停,可以重新尝试,或点蜡烛吹灭.", "重新尝试");
     }
   });
   window.addEventListener("pagehide", () => {
