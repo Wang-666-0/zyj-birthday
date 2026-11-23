@@ -95,7 +95,8 @@
 
 /* Each opening scene occupies the viewport; the greeting waits behind it. */
 body.intro-active { overflow: hidden; }
-.intro-active .music-toggle { display: none; }
+.intro-active .music-toggle { z-index: 50; top: max(14px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); bottom: auto; min-height: 40px; padding: 8px 13px; font-size: .8125rem; background: #fff8ede8; box-shadow: 0 3px 12px #62361c10; }
+.intro-active .music-toggle[aria-pressed="true"] { background: #a94714; }
 .gift-intro { position: fixed; inset: 0; z-index: 40; height: 100vh; height: 100svh; min-height: 0; padding: 0; overflow: auto; background: transparent; isolation: isolate; }
 .gift-intro::before { content: ""; position: fixed; inset: 0; z-index: -1; background: radial-gradient(ellipse at 50% 43%, #ffedca, #fff8ed 65%); transition: opacity 2.25s ease; }
 .intro-topline, .intro-eyebrow, .intro-route, .intro-skip { display: none; }

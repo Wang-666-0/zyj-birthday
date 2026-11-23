@@ -11,7 +11,9 @@
     [67, .5], [67, .5], [79, 1], [76, 1], [72, 1], [71, 1], [69, 1],
     [77, .5], [77, .5], [76, 1], [72, 1], [74, 1], [72, 2]
   ];
-  // A quiet, locally synthesised birthday melody. Nothing is downloaded.
+  // A locally synthesised birthday melody. Nothing is downloaded.
+  const normalVolume = .32;
+  const microphoneVolume = .018;
   const score = [];
   let melodyBeat = 0;
   notes.forEach(([note, beats]) => {
@@ -33,6 +35,7 @@
   let master;
   let playing = false;
   let userPaused = false;
+  let microphoneActive = false;
   let pendingStart = null;
   let generation = 0;
   let timer = null;
@@ -44,6 +47,7 @@
       button.textContent = playing ? "暂停音乐" : /未能|无法/.test(message || "") ? "重试音乐" : "播放音乐";
       button.setAttribute("aria-pressed", String(playing));
       button.dataset.musicState = playing ? "playing" : "paused";
+      button.dataset.musicVolume = microphoneActive ? "soft" : "normal";
     }
     if (status) status.textContent = message || (playing ? "生日音乐正在播放" : "生日音乐已暂停");
   }
@@ -131,11 +135,26 @@
     if (context && context.state !== "closed") return;
     context = new Context();
     master = context.createGain();
-    master.gain.value = .16;
+    master.gain.value = microphoneActive ? microphoneVolume : normalVolume;
     master.connect(context.destination);
     context.addEventListener("statechange", () => {
       if (playing && context.state !== "running") pause(false, "音乐已暂停,点击播放音乐可继续");
     });
+  }
+
+  function setMicrophoneActive(active) {
+    active = Boolean(active);
+    if (microphoneActive === active) return;
+    microphoneActive = active;
+    if (master && context && context.state !== "closed") {
+      const now = context.currentTime;
+      const current = master.gain.value;
+      master.gain.cancelScheduledValues(now);
+      master.gain.setValueAtTime(current, now);
+      // Keep the melody clock running; soften speaker sound during breath sensing.
+      master.gain.linearRampToValueAtTime(active ? microphoneVolume : normalVolume, now + (active ? .12 : .9));
+    }
+    render();
   }
 
   function start(explicit) {
@@ -159,7 +178,7 @@
     }
     const task = Promise.resolve(resumed).then(() => {
       if (attempt !== generation || userPaused || document.hidden) {
-        if ((userPaused || document.hidden || !pendingStart) && context.state === "running") {
+        if ((userPaused || document.hidden || (!playing && !pendingStart)) && context.state === "running") {
           context.suspend().catch(() => {});
         }
         return false;
@@ -194,13 +213,22 @@
     button.hidden = false;
     button.addEventListener("click", toggle);
   }
+  function startOnInteraction(event) {
+    if (button && button.contains(event.target)) return;
+    if (event.type === "keydown" && (event.repeat || !["Enter", " ", "ArrowRight", "ArrowLeft"].includes(event.key))) return;
+    start(false);
+  }
+  // Browsers require a gesture before audio. The first touch starts the opening music.
+  document.addEventListener("pointerdown", startOnInteraction, { capture: true, passive: true });
+  document.addEventListener("click", startOnInteraction, true);
+  document.addEventListener("keydown", startOnInteraction, true);
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && (playing || pendingStart)) pause(false, "音乐已暂停,点击播放音乐可继续");
   });
   window.addEventListener("pagehide", () => pause(false));
   window.BirthdayMusic = Object.freeze({
     startFromGesture: () => start(false),
-    pauseForMic: () => pause(false, "吹灭蜡烛后,点拆礼物继续听生日音乐"),
+    setMicrophoneActive,
     toggle,
     stop: () => pause(true)
   });

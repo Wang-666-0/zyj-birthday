@@ -78,6 +78,7 @@
     }
     if (breathMeter) breathMeter.hidden = true;
     updateBreathMeter(0);
+    window.BirthdayMusic?.setMicrophoneActive(false);
   }
 
   function closeMicrophoneContext(context) {
@@ -293,6 +294,7 @@
 
   async function startMicrophone() {
     if (stage !== "candle" || microphonePending || microphoneStream) return;
+    music();
     blowButton.disabled = false;
     microphoneStatus("waiting", "请在弹窗中允许麦克风,随后轻轻吹气.", "正在开启...");
     const Context = window.AudioContext || window.webkitAudioContext;
@@ -313,8 +315,8 @@
       microphoneFailure("麦克风还没准备好,可以重新尝试,或点蜡烛吹灭.");
     }, 20000);
 
-    // Silence the birthday melody while sensing breath so speaker sound cannot trigger it.
-    window.BirthdayMusic?.pauseForMic();
+    // Keep music continuous at a low level so speaker sound is less likely to trigger sensing.
+    window.BirthdayMusic?.setMicrophoneActive(true);
     let detectionContext;
     let localStream = null;
     try {
