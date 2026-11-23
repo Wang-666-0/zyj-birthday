@@ -12,4 +12,6 @@ The birthday draw has ten slips in total: nine good-luck messages and the final 
 
 The active address remains https://wang-666-0.github.io/zyj-birthday/ so the existing PCB QR continues to work.
 
-The opening sequence is make a wish and blow out the candle, unwrap the gift, then enter the birthday page. The candle always has a tap button. Optional microphone sensing asks permission only after its own button is clicked, processes volume locally without recording or uploading, and releases tracks on completion, skip, timeout or page exit. Its physical microphone behaviour still needs checking on the recipient's phone.
+The opening uses one full-screen scene at a time: make a wish and extinguish the candle, then drag the paw along the dashed seam to tear the gift open. Partial tears can continue, the gift gently follows the drag, and the wrapping separates to reveal the fortune section underneath without another confirmation button. Keyboard controls are also supported.
+
+The candle has a tap target. Optional microphone sensing asks permission only after its own button is clicked, processes volume locally without recording or uploading, and releases tracks on completion, timeout or page exit. Its physical microphone behaviour still needs checking on the recipient's phone. Music begins at the completing tear gesture, when its controls become available on the greeting page.
