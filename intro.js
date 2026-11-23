@@ -235,7 +235,7 @@
       giftRoute.classList.add("is-done");
       wishesRoute.setAttribute("aria-current", "step");
       enterPage();
-    }, reducedMotion.matches ? 80 : 1800);
+    }, reducedMotion.matches ? 80 : 2400);
   }
 
   function startTear(event) {
