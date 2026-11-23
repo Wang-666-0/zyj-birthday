@@ -8,11 +8,11 @@
     <meta name="description" content="一只小橘猫,带着一份认真的生日祝福.ZYJ,生日快乐.">
     <title>生日快乐 ZYJ. | 一只橘猫的小惊喜</title>
     <link rel="icon" type="image/svg+xml" href="assets/paw.svg">
-    <link rel="stylesheet" href="styles.css?v=20261123-4">
-    <link rel="stylesheet" href="intro.css?v=20261123-4">
-    <script src="music.js?v=20261123-4" defer></script>
-    <script src="app.js?v=20261123-4" defer></script>
-    <script src="intro.js?v=20261123-4" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20261123-5">
+    <link rel="stylesheet" href="intro.css?v=20261123-5">
+    <script src="music.js?v=20261123-5" defer></script>
+    <script src="app.js?v=20261123-5" defer></script>
+    <script src="intro.js?v=20261123-5" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到生日祝福</a>
@@ -36,16 +36,16 @@
             <div class="intro-cake-top"></div>
             <div class="intro-cake-body"><span></span><span></span><span></span><img src="assets/paw.svg" width="38" height="38" alt=""></div>
             <div class="intro-cake-bottom"></div><div class="intro-cake-plate"></div>
-            <button class="intro-blow-hotspot" id="intro-blow" type="button" aria-label="吹灭蜡烛"><span class="sr-only">吹灭蜡烛</span></button>
+            <button class="intro-blow-hotspot" id="intro-blow" type="button" aria-label="吹灭蜡烛" disabled><span class="sr-only">吹灭蜡烛</span></button>
           </div>
-          <p class="intro-scene-status" id="intro-cake-status" role="status" aria-live="polite">许好愿望,点蜡烛吹灭.</p>
+          <p class="intro-scene-status" id="intro-cake-status" role="status" aria-live="polite">许好愿望后,点下面的按钮开始.</p>
           <div class="intro-actions">
-            <button class="intro-secondary" id="intro-microphone" type="button" aria-describedby="intro-microphone-note">对着手机吹</button>
+            <button class="primary-button intro-start-blowing" id="intro-microphone" type="button" aria-describedby="intro-microphone-note">许好愿望,开始吹蜡烛</button>
           </div>
           <div class="intro-breath-slot">
             <div class="intro-breath-meter" id="intro-breath-meter" role="progressbar" aria-label="吹气音量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden><span id="intro-breath-level"></span></div>
           </div>
-          <p class="intro-microphone-note" id="intro-microphone-note">需麦克风,仅检测音量.不录音,不上传.</p>
+          <p class="intro-microphone-note" id="intro-microphone-note">随后请允许麦克风,再轻轻吹一口气.仅检测音量,不录音或上传.</p>
         </div>
 
         <div class="intro-gift-step" id="intro-gift-step" hidden>

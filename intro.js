@@ -73,7 +73,7 @@
     closeMicrophoneContext(oldContext);
     microphoneButton.disabled = stage !== "candle";
     if (wasActive || stage !== "candle") {
-      microphoneButton.textContent = "对着手机吹";
+      microphoneButton.textContent = "许好愿望,开始吹蜡烛";
       cakeStatus.removeAttribute("data-mic-state");
     }
     if (breathMeter) breathMeter.hidden = true;
@@ -170,6 +170,8 @@
   function showGift() {
     if (stage !== "blown") return;
     stage = "gift";
+    intro.classList.remove("is-wish-complete");
+    intro.classList.add("is-gift-visible");
     cakeStep.hidden = true;
     giftStep.hidden = false;
     title.textContent = "这份礼物,等你拆开.";
@@ -188,10 +190,11 @@
     stage = "blown";
     stopMicrophone();
     cakeArt.classList.add("is-blown");
+    intro.classList.add("is-wish-complete");
     cakeStatus.textContent = "蜡烛吹灭啦.愿你许下的愿望,都慢慢实现.";
     blowButton.disabled = true;
     blowButton.setAttribute("aria-label", "愿望已收好");
-    transitionTimer = window.setTimeout(showGift, reducedMotion.matches ? 100 : 1050);
+    transitionTimer = window.setTimeout(showGift, reducedMotion.matches ? 100 : 1800);
   }
 
   function setTearProgress(value) {
@@ -232,7 +235,7 @@
       giftRoute.classList.add("is-done");
       wishesRoute.setAttribute("aria-current", "step");
       enterPage();
-    }, reducedMotion.matches ? 80 : 850);
+    }, reducedMotion.matches ? 80 : 1800);
   }
 
   function startTear(event) {
@@ -290,7 +293,8 @@
 
   async function startMicrophone() {
     if (stage !== "candle" || microphonePending || microphoneStream) return;
-    microphoneStatus("waiting", "正在开启吹气感应,请允许使用麦克风.", "正在开启...");
+    blowButton.disabled = false;
+    microphoneStatus("waiting", "请在弹窗中允许麦克风,随后轻轻吹气.", "正在开启...");
     const Context = window.AudioContext || window.webkitAudioContext;
     const modernMedia = navigator.mediaDevices?.getUserMedia;
     const legacyMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
@@ -423,7 +427,9 @@
     }
   }
 
-  blowButton.addEventListener("click", () => extinguish(false));
+  blowButton.addEventListener("click", () => {
+    if (!blowButton.disabled) extinguish(false);
+  });
   microphoneButton.addEventListener("click", startMicrophone);
   tearTrack.addEventListener("pointerdown", startTear);
   tearTrack.addEventListener("pointermove", moveTear);
@@ -451,6 +457,7 @@
 
   // Activate only after all controls and handlers exist; without JS the greeting is readable.
   intro.hidden = false;
+  blowButton.disabled = true;
   enterButton.hidden = true;
   page.hidden = true;
   document.body.classList.add("intro-active");

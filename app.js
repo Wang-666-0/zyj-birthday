@@ -190,7 +190,7 @@
         drawButton.disabled = false;
         drawButton.textContent = last ? "再看看小纸条" : drawCount === totalDraws - 1 ? "抽最后一支签" : "再抽一支";
         if (last) revealLetter();
-      }, reducedMotion.matches ? 80 : 650);
+      }, reducedMotion.matches ? 80 : 1050);
     });
   }
 

@@ -54,10 +54,13 @@
 .intro-gift-art.is-open .intro-gift-lid { opacity: 0; transform: translate(-27px,-104px) rotate(-16deg); }
 .intro-gift-art.is-open .intro-gift-glow { opacity: .75; }
 .intro-gift-art.is-open .intro-gift-surprise { opacity: 1; transform: translateY(-10px) rotate(-5deg); }
-.intro-cake-step, .intro-gift-step { animation: intro-step-in .35s ease-out; }
+.intro-cake-step, .intro-gift-step { animation: intro-step-in .7s ease-out; }
+.is-wish-complete .intro-title, .is-wish-complete .intro-description, .is-wish-complete .intro-cake-step { animation: intro-scene-out .7s ease .95s both; }
+.is-gift-visible .intro-title, .is-gift-visible .intro-description { animation: intro-step-in .7s ease-out; }
 @keyframes intro-flicker { 0%,100% { transform: rotate(-3deg) scale(.97,1); } 50% { transform: rotate(4deg) scale(1.06,.96); } }
 @keyframes intro-smoke { from { opacity: .7; transform: translate(0,3px) scale(.7); } to { opacity: 0; transform: translate(11px,-36px) scale(1.5); } }
 @keyframes intro-step-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes intro-scene-out { to { opacity: 0; transform: translateY(-8px); } }
 @media (max-width: 600px) {
   .gift-intro { padding: 0 24px 90px; }
   .intro-topline { padding: 23px 0 20px; gap: 12px; font-size: .875rem; }
@@ -94,7 +97,7 @@
 body.intro-active { overflow: hidden; }
 .intro-active .music-toggle { display: none; }
 .gift-intro { position: fixed; inset: 0; z-index: 40; height: 100vh; height: 100svh; min-height: 0; padding: 0; overflow: auto; background: transparent; isolation: isolate; }
-.gift-intro::before { content: ""; position: fixed; inset: 0; z-index: -1; background: radial-gradient(ellipse at 50% 43%, #ffedca, #fff8ed 65%); transition: opacity .85s ease; }
+.gift-intro::before { content: ""; position: fixed; inset: 0; z-index: -1; background: radial-gradient(ellipse at 50% 43%, #ffedca, #fff8ed 65%); transition: opacity 1.65s ease; }
 .intro-topline, .intro-eyebrow, .intro-route, .intro-skip { display: none; }
 .intro-scene { width: 100%; min-height: 100vh; min-height: 100svh; max-width: none; margin: 0; padding: 36px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .intro-title { max-width: 24em; font-size: clamp(1.6rem, 5vw, 2.4rem); line-height: 1.5; }
@@ -105,6 +108,7 @@ body.intro-active { overflow: hidden; }
 .intro-blow-hotspot:disabled { cursor: default; }
 .intro-scene-status { min-height: 3.7em; margin: 14px 0 10px; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
 .intro-secondary { min-height: 44px; padding: 8px 12px; background: transparent; border: 0; border-bottom: 1px dotted #bd916c; border-radius: 0; color: #9a7457; font-size: .875rem; font-weight: 500; }
+.intro-start-blowing { max-width: 100%; min-width: 225px; }
 .intro-microphone-note { font-size: .8125rem; margin-top: 13px; color: #9a806a; }
 .intro-breath-slot { height: 18px; display: grid; place-items: center; }
 .intro-breath-meter { width: 132px; height: 5px; overflow: hidden; background: #ead9c2; border-radius: 999px; }
@@ -114,7 +118,7 @@ body.intro-active { overflow: hidden; }
 .intro-gift-art { --tear: 0; --tear-percent: 0%; width: min(320px, 80vw); height: 310px; margin: 30px auto 16px; transform-style: preserve-3d; transform: perspective(900px) rotateX(var(--view-x, 0deg)) rotateY(var(--view-y, 0deg)); transition: transform .16s ease-out; user-select: none; -webkit-user-select: none; }
 .intro-gift-core { position: absolute; inset: 65px 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9d4819; font-size: 1.2rem; font-weight: 800; border-radius: 24px; background: #ffe4ac; box-shadow: 0 0 50px #ffcd6b66; }
 .intro-gift-core img { width: 140px; height: auto; }
-.intro-wrap-half { position: absolute; left: 18px; right: 18px; height: 123px; border: 1.5px solid #ba753b; background-color: #efaa61; background-image: radial-gradient(#fff0d750 2px, transparent 2.5px); background-size: 22px 22px; box-shadow: 0 8px 22px #85471714; transition: transform .85s cubic-bezier(.2,.75,.2,1), opacity .7s ease; overflow: visible; will-change: transform; }
+.intro-wrap-half { position: absolute; left: 18px; right: 18px; height: 123px; border: 1.5px solid #ba753b; background-color: #efaa61; background-image: radial-gradient(#fff0d750 2px, transparent 2.5px); background-size: 22px 22px; box-shadow: 0 8px 22px #85471714; transition: transform 1.6s cubic-bezier(.2,.75,.2,1), opacity 1.45s ease; overflow: visible; will-change: transform; }
 .intro-wrap-top { top: 37px; border-radius: 12px 12px 0 0; clip-path: polygon(0 0,100% 0,100% 96%,96% 100%,91% 95%,86% 100%,81% 96%,76% 100%,71% 95%,66% 100%,61% 96%,56% 100%,51% 95%,46% 100%,41% 96%,36% 100%,31% 95%,26% 100%,21% 96%,16% 100%,11% 95%,6% 100%,0 96%); transform: translateY(calc(var(--tear) * -5px)); }
 .intro-wrap-bottom { top: 154px; border-radius: 0 0 12px 12px; clip-path: polygon(0 4%,6% 0,11% 5%,16% 0,21% 4%,26% 0,31% 5%,36% 0,41% 4%,46% 0,51% 5%,56% 0,61% 4%,66% 0,71% 5%,76% 0,81% 4%,86% 0,91% 5%,96% 0,100% 4%,100% 100%,0 100%); transform: translateY(calc(var(--tear) * 5px)); }
 .intro-wrap-ribbon { position: absolute; left: calc(50% - 16px); width: 32px; top: 0; bottom: 0; background: #fff0d6; box-shadow: -1px 0 #d39b64,1px 0 #d39b64; }
@@ -131,12 +135,12 @@ body.intro-active { overflow: hidden; }
 .intro-tear-instructions { margin: 8px 0 0; font-size: .8125rem; line-height: 1.8; color: #9a806a; }
 .intro-gift-art.is-open .intro-wrap-top { transform: translate(-12vw,-90vh) rotate(-14deg); opacity: 0; }
 .intro-gift-art.is-open .intro-wrap-bottom { transform: translate(10vw,90vh) rotate(12deg); opacity: 0; }
-.intro-gift-art.is-open .intro-tear-track { opacity: 0; transition: opacity .2s; }
-.intro-gift-art.is-open .intro-gift-core { opacity: 0; transform: scale(1.12); transition: opacity .65s, transform .85s; }
+.intro-gift-art.is-open .intro-tear-track { opacity: 0; transition: opacity .4s; }
+.intro-gift-art.is-open .intro-gift-core { opacity: 0; transform: scale(1.12); transition: opacity 1.35s, transform 1.6s; }
 .intro-revealing .gift-intro::before { opacity: 0; }
-.intro-revealing .intro-title, .intro-revealing .intro-description, .intro-revealing .intro-scene-status, .intro-revealing .intro-tear-instructions { opacity: 0; transform: translateY(-8px); transition: opacity .35s, transform .6s; }
+.intro-revealing .intro-title, .intro-revealing .intro-description, .intro-revealing .intro-scene-status, .intro-revealing .intro-tear-instructions { opacity: 0; transform: translateY(-8px); transition: opacity .7s, transform 1.25s; }
 .page-shell.is-arriving #fortune { opacity: 0; }
-.page-shell.is-arriving.is-visible #fortune { opacity: 1; transition: opacity .75s ease .12s; }
+.page-shell.is-arriving.is-visible #fortune { opacity: 1; transition: opacity 1.3s ease .25s; }
 @media (min-width: 760px) and (min-height: 720px) {
   .intro-cake-art { margin-top: 60px; margin-bottom: 42px; transform: scale(1.3); }
 }

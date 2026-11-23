@@ -130,8 +130,8 @@ h1 { margin: 0; font-size: clamp(3.5rem, 6.8vw, 5.2rem); line-height: 1.18; lett
 .fortune-collection { display: flex; flex-wrap: wrap; list-style: none; padding: 0; margin: 0; gap: 9px; }
 .fortune-collection li { padding: 7px 12px; border: 1px solid #dfbd9d; border-radius: 999px; color: #845032; font-size: .875rem; background: #fff9ef; }
 .fortune-reset { flex-shrink: 0; min-height: 44px; padding: 8px 4px; border: 0; border-bottom: 1px solid #b56e3b; background: transparent; color: var(--orange-dark); font-size: .9375rem; cursor: pointer; }
-.is-drawing { animation: shake-jar .14s ease-in-out 4; }
-.fortune-paper.is-revealed { animation: reveal-slip .45s ease-out both; }
+.is-drawing { animation: shake-jar .2s ease-in-out 5; }
+.fortune-paper.is-revealed { animation: reveal-slip .8s ease-out both; }
 @keyframes shake-jar { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
 @keyframes reveal-slip { from { opacity: .3; transform: translateY(12px) rotate(-4deg); } to { opacity: 1; transform: translateY(0) rotate(-2deg); } }
 
