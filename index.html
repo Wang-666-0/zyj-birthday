@@ -5,81 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#fff8ed">
     <meta name="robots" content="noindex, nofollow, noarchive">
-    <meta name="description" content="一只小橘猫，带着一份认真的生日祝福。ZYJ，生日快乐。">
+    <meta name="description" content="一只小橘猫,带着一份认真的生日祝福.ZYJ,生日快乐.">
     <title>生日快乐 ZYJ. | 一只橘猫的小惊喜</title>
     <link rel="icon" type="image/svg+xml" href="assets/paw.svg">
-    <link rel="stylesheet" href="styles.css">
-    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20261123-1">
+    <script src="music.js?v=20261123-1" defer></script>
+    <script src="app.js?v=20261123-1" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到生日祝福</a>
     <div class="confetti" id="confetti" aria-hidden="true"></div>
     <div class="page-shell">
       <header class="masthead">
-        <a class="wordmark" href="#main" aria-label="一只橘猫的小惊喜，回到顶部">
+        <a class="wordmark" href="#main" aria-label="一只橘猫的小惊喜,回到顶部">
           <img src="assets/paw.svg" width="28" height="28" alt="">
           <span>一只橘猫的小惊喜</span>
         </a>
-        <time class="date-stamp" data-date datetime="2026-12-03">2026.12.03</time>
+        <div class="masthead-tools">
+          <time class="date-stamp" data-date datetime="2026-12-03">2026.12.03</time>
+          <button class="music-toggle" id="music-toggle" type="button" aria-pressed="false" hidden>播放音乐</button>
+          <span class="sr-only" id="music-status" role="status"></span>
+        </div>
       </header>
 
       <main id="main">
         <section class="hero" aria-labelledby="birthday-title">
           <div class="hero-copy">
-            <p class="eyebrow">今天，把祝福送给你</p>
+            <p class="eyebrow">今天,把祝福送给你</p>
             <h1 id="birthday-title">生日快乐<span class="recipient-line"><span data-recipient>ZYJ</span><span class="title-dot">.</span></span></h1>
-            <p class="opening" data-opening>这只小橘猫，替我送来一点生日的好心情。</p>
+            <p class="opening" data-opening>这只小橘猫,替我送来一点生日的好心情.</p>
             <a class="primary-button" id="open-note" href="#letter">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5 12 13l8-5.5M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 17V7A1.5 1.5 0 0 1 5 5.5Z"/></svg>
-              打开生日小纸条
+              <span id="hero-action-label">打开生日小纸条</span>
             </a>
           </div>
           <div class="hero-illustration">
             <span class="sunburst sunburst-one" aria-hidden="true"></span>
             <span class="sunburst sunburst-two" aria-hidden="true"></span>
             <div class="cat-frame">
-              <img class="orange-cat" src="assets/orange-cat.svg" width="450" height="420" alt="一只眯着眼睛笑的橘猫，额头和脸颊有深橘色虎斑，口鼻是奶白色。">
+              <img class="orange-cat" src="assets/orange-cat.svg" width="450" height="420" alt="一只眯着眼睛笑的橘猫,额头和脸颊有深橘色虎斑,口鼻是奶白色.">
             </div>
-            <p class="cat-caption"><span aria-hidden="true">喵</span> 生日祝福，已送到。</p>
+            <p class="cat-caption"><span aria-hidden="true">喵</span> 生日祝福,已送到.</p>
+          </div>
+        </section>
+
+        <section class="fortune-section" id="fortune" aria-labelledby="fortune-title" hidden>
+          <div class="section-intro fortune-intro">
+            <p class="eyebrow">小橘猫的生日签筒</p>
+            <h2 id="fortune-title">把今天的好运,抽出来.</h2>
+            <p class="fortune-description">五支小签,愿好运都落在你这边.最后一支,藏着我想说的话.</p>
+          </div>
+          <div class="fortune-stage" id="fortune-stage">
+            <div class="fortune-draw-area">
+              <div class="fortune-illustration" id="fortune-illustration" aria-hidden="true">
+                <div class="fortune-sticks"><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="fortune-jar"><img src="assets/paw.svg" alt="" width="44" height="44"><span>好运</span></div>
+              </div>
+              <p class="fortune-progress" id="fortune-progress">已收下 0 / 5 份祝福</p>
+              <button class="primary-button fortune-draw" id="draw-fortune" type="button" aria-controls="fortune-result">抽一支生日签</button>
+              <p class="fortune-music-hint">点一下,让祝福和生日旋律一起到来.</p>
+            </div>
+            <div class="fortune-paper" id="fortune-result" role="status" aria-live="polite" aria-atomic="true">
+              <span class="fortune-stamp" id="fortune-stamp">生日限定</span>
+              <h3 id="fortune-result-title">今天的第一份好运</h3>
+              <p class="fortune-result-text" id="fortune-result-text">轻轻摇一摇签筒,看看小橘猫为你准备了什么.</p>
+              <p class="fortune-result-aside" id="fortune-result-aside">每一支,都是送给你的祝福.</p>
+            </div>
+          </div>
+          <div class="fortune-bottom">
+            <ul class="fortune-collection" id="fortune-collection" aria-label="已经抽到的生日签"></ul>
+            <button class="fortune-reset" id="reset-fortunes" type="button" hidden>再抽一轮</button>
           </div>
         </section>
 
         <section class="wishes" aria-labelledby="wishes-title">
           <div class="wishes-heading">
             <img src="assets/paw.svg" width="28" height="28" alt="">
-            <h2 id="wishes-title">新的一岁，愿你……</h2>
+            <h2 id="wishes-title">新的一岁,愿你...</h2>
           </div>
           <ul class="wish-list">
             <li><span class="wish-sparkle" aria-hidden="true"></span><span>常常吃到喜欢的东西</span></li>
             <li><span class="wish-sparkle" aria-hidden="true"></span><span>遇见许多可爱的小事</span></li>
-            <li><span class="wish-sparkle" aria-hidden="true"></span><span>认真喜欢的事，都有回响</span></li>
+            <li><span class="wish-sparkle" aria-hidden="true"></span><span>认真喜欢的事,都有回响</span></li>
           </ul>
         </section>
 
         <section class="letter-section" id="letter" aria-labelledby="letter-title">
           <div class="section-intro">
-            <p class="eyebrow">还有几句话，想送给你</p>
-            <h2 id="letter-title">一张小纸条，一份认真祝福。</h2>
+            <p class="eyebrow">还有几句话,想送给你</p>
+            <h2 id="letter-title">一张小纸条,一份认真祝福.</h2>
           </div>
           <article class="letter-card" id="letter-card">
             <div class="letter-cover">
               <div class="envelope-seal" aria-hidden="true"><img src="assets/paw.svg" width="38" height="38" alt=""></div>
               <div class="letter-address">
                 <span class="letter-to">给 <span data-recipient>ZYJ</span></span>
-                <span class="letter-caption">今天的你，值得收下很多很多祝福。</span>
+                <span class="letter-caption">今天的你,值得收下很多很多祝福.</span>
               </div>
               <button class="note-toggle" id="note-toggle" type="button" aria-expanded="true" aria-controls="letter-body" hidden>把小纸条收好</button>
             </div>
             <div class="letter-body" id="letter-body" tabindex="-1" role="region" aria-label="生日小纸条">
               <div class="letter-body-inner">
-                <p class="letter-greeting"><span data-recipient>ZYJ</span>，生日快乐！</p>
+                <p class="letter-greeting"><span data-recipient>ZYJ</span>,生日快乐!</p>
                 <div id="message-paragraphs">
-                  <p>愿新的一岁里，你常常遇见让人开心的小事：好吃的一餐、好看的风景，还有突然冒出来的一点好运。</p>
-                  <p>忙的时候，也记得给自己留一点休息的时间。喜欢的事情可以慢慢做，想去的地方也可以慢慢抵达。</p>
-                  <p>希望这只小橘猫，能陪你把平凡的日子过得更有意思。今天就安心收下祝福，开开心心地过生日吧。</p>
+                  <p>愿新的一岁里,你常常遇见让人开心的小事:好吃的一餐,好看的风景,还有突然冒出来的一点好运.</p>
+                  <p>忙的时候,也记得给自己留一点休息的时间.喜欢的事情可以慢慢做,想去的地方也可以慢慢抵达.</p>
+                  <p>希望这只小橘猫,能陪你把平凡的日子过得更有意思.今天就安心收下祝福,开开心心地过生日吧.</p>
                 </div>
-                <p class="letter-signoff" data-signoff>祝你新的一岁，一切都好。</p>
+                <p class="letter-signoff" data-signoff>祝你新的一岁,一切都好.</p>
                 <time class="letter-date" data-date datetime="2026-12-03">2026.12.03</time>
+                <p class="letter-signature">-WSW</p>
               </div>
             </div>
           </article>
@@ -87,8 +122,8 @@
 
         <section class="photo-section" id="photo-section" aria-labelledby="photos-title" hidden>
           <div class="section-intro">
-            <p class="eyebrow">把喜欢的片刻，好好留下</p>
-            <h2 id="photos-title">一些想珍藏的小瞬间。</h2>
+            <p class="eyebrow">把喜欢的片刻,好好留下</p>
+            <h2 id="photos-title">一些想珍藏的小瞬间.</h2>
           </div>
           <div class="photo-grid" id="photo-grid"></div>
         </section>
@@ -96,7 +131,7 @@
 
       <footer class="footer">
         <img src="assets/paw.svg" width="24" height="24" alt="">
-        <p>愿这只小猫，把一点好心情留在你身边。</p>
+        <p>愿这只小猫,把一点好心情留在你身边.</p>
         <span>给 <span data-recipient>ZYJ</span> 的生日祝福</span>
       </footer>
     </div>
