@@ -12,7 +12,7 @@
     [77, .5], [77, .5], [76, 1], [72, 1], [74, 1], [72, 2]
   ];
   // A locally synthesised birthday melody. Nothing is downloaded.
-  const normalVolume = .32;
+  const normalVolume = .64;
   const microphoneVolume = .018;
   const score = [];
   let melodyBeat = 0;
@@ -35,6 +35,7 @@
   let master;
   let playing = false;
   let userPaused = false;
+  let waitingForGesture = true;
   let microphoneActive = false;
   let pendingStart = null;
   let generation = 0;
@@ -43,13 +44,15 @@
   let scoreIndex = 0;
 
   function render(message) {
+    const waiting = !playing && !userPaused && waitingForGesture;
     if (button) {
-      button.textContent = playing ? "暂停音乐" : /未能|无法/.test(message || "") ? "重试音乐" : "播放音乐";
+      button.textContent = playing ? "暂停音乐" : waiting ? "开启声音" : /未能|无法/.test(message || "") ? "重试音乐" : "播放音乐";
       button.setAttribute("aria-pressed", String(playing));
-      button.dataset.musicState = playing ? "playing" : "paused";
+      button.dataset.musicState = playing ? "playing" : waiting ? "waiting" : "paused";
+      button.dataset.musicEnabled = String(!userPaused);
       button.dataset.musicVolume = microphoneActive ? "soft" : "normal";
     }
-    if (status) status.textContent = message || (playing ? "生日音乐正在播放" : "生日音乐已暂停");
+    if (status) status.textContent = message || (playing ? "生日音乐正在播放" : waiting ? "音乐已默认开启,轻触屏幕即可唤醒声音" : "生日音乐已暂停");
   }
 
   function removeVoice(voice) {
@@ -106,6 +109,7 @@
 
   function pause(explicit, message) {
     if (explicit) userPaused = true;
+    waitingForGesture = !userPaused;
     generation += 1;
     pendingStart = null;
     playing = false;
@@ -137,9 +141,25 @@
     master = context.createGain();
     master.gain.value = microphoneActive ? microphoneVolume : normalVolume;
     master.connect(context.destination);
+    const createdContext = context;
     context.addEventListener("statechange", () => {
-      if (playing && context.state !== "running") pause(false, "音乐已暂停,点击播放音乐可继续");
+      if (context !== createdContext) return;
+      if (context.state === "running") beginPlayback();
+      else if (playing) pause(false, "音乐已暂停,轻触屏幕可继续");
     });
+  }
+
+  function beginPlayback() {
+    if (playing) return true;
+    if (userPaused || document.hidden || !context || context.state !== "running") return false;
+    playing = true;
+    waitingForGesture = false;
+    cycleStart = context.currentTime + .05;
+    scoreIndex = 0;
+    schedule();
+    timer = window.setInterval(schedule, 80);
+    render();
+    return true;
   }
 
   function setMicrophoneActive(active) {
@@ -157,23 +177,26 @@
     render();
   }
 
-  function start(explicit) {
+  function start(explicit, retryPending = false) {
     if ((!explicit && userPaused) || document.hidden) return Promise.resolve(false);
     if (explicit) userPaused = false;
     if (playing) return Promise.resolve(true);
-    if (pendingStart) return pendingStart;
+    if (pendingStart && !retryPending) return pendingStart;
     if (!Context) {
+      waitingForGesture = false;
       render("暂时无法播放音乐,点击可再试");
       return Promise.resolve(false);
     }
     const attempt = ++generation;
-    // Construct and resume synchronously inside the actual click handler.
+    waitingForGesture = true;
+    render("音乐已默认开启,正在准备生日旋律");
+    // Try on entry; gestures always retry synchronously even if autoplay is still pending.
     let resumed;
     try {
       ensureContext();
       resumed = context.resume();
     } catch (_) {
-      render("音乐未能播放,点击播放音乐再试");
+      render("音乐已默认开启,轻触屏幕即可播放");
       return Promise.resolve(false);
     }
     const task = Promise.resolve(resumed).then(() => {
@@ -184,15 +207,9 @@
         return false;
       }
       if (context.state !== "running") throw new Error("Audio still paused");
-      playing = true;
-      cycleStart = context.currentTime + .05;
-      scoreIndex = 0;
-      schedule();
-      timer = window.setInterval(schedule, 80);
-      render();
-      return true;
+      return beginPlayback();
     }).catch(() => {
-      if (attempt === generation) pause(false, "音乐未能播放,点击播放音乐再试");
+      if (attempt === generation) pause(false, "音乐已默认开启,轻触屏幕即可播放");
       return false;
     }).finally(() => {
       if (pendingStart === task) pendingStart = null;
@@ -202,11 +219,11 @@
   }
 
   function toggle() {
-    if (playing || pendingStart) {
+    if (playing) {
       pause(true);
       return Promise.resolve(false);
     }
-    return start(true);
+    return start(true, true);
   }
 
   if (button) {
@@ -216,21 +233,25 @@
   function startOnInteraction(event) {
     if (button && button.contains(event.target)) return;
     if (event.type === "keydown" && (event.repeat || !["Enter", " ", "ArrowRight", "ArrowLeft"].includes(event.key))) return;
-    start(false);
+    start(false, true);
   }
-  // Browsers require a gesture before audio. The first touch starts the opening music.
+  // Keep a gesture fallback for browsers that block audible autoplay.
   document.addEventListener("pointerdown", startOnInteraction, { capture: true, passive: true });
   document.addEventListener("click", startOnInteraction, true);
   document.addEventListener("keydown", startOnInteraction, true);
+  document.addEventListener("WeixinJSBridgeReady", () => start(false, true));
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && (playing || pendingStart)) pause(false, "音乐已暂停,点击播放音乐可继续");
+    else if (!document.hidden) start(false, true);
   });
+  window.addEventListener("pageshow", () => start(false, true));
   window.addEventListener("pagehide", () => pause(false));
   window.BirthdayMusic = Object.freeze({
-    startFromGesture: () => start(false),
+    startFromGesture: () => start(false, true),
     setMicrophoneActive,
     toggle,
     stop: () => pause(true)
   });
-  render("点一下,一起听生日音乐");
+  render("音乐已默认开启,正在准备生日旋律");
+  start(false);
 })();
