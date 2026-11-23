@@ -41,7 +41,7 @@
 
   function render(message) {
     if (button) {
-      button.textContent = playing ? "暂停音乐" : "播放音乐";
+      button.textContent = playing ? "暂停音乐" : /未能|无法/.test(message || "") ? "重试音乐" : "播放音乐";
       button.setAttribute("aria-pressed", String(playing));
       button.dataset.musicState = playing ? "playing" : "paused";
     }
@@ -49,7 +49,8 @@
   }
 
   function removeVoice(voice) {
-    voices.delete(voice);
+    if (!voices.delete(voice)) return;
+    voice.oscillator.onended = null;
     voice.oscillator.disconnect();
     voice.gain.disconnect();
   }
@@ -113,7 +114,12 @@
           voice.gain.gain.cancelScheduledValues(now);
           voice.gain.gain.setValueAtTime(.0001, now);
           voice.oscillator.stop(now + .01);
-        } catch (_) { removeVoice(voice); }
+        } catch (_) {
+          // A voice may already have ended while the page was being hidden.
+        } finally {
+          // A suspended audio clock may never reach the scheduled stop time.
+          removeVoice(voice);
+        }
       });
       // Suspend on pause as well as when hidden, saving phone battery.
       if (context.state !== "closed") context.suspend().catch(() => {});
@@ -194,8 +200,9 @@
   window.addEventListener("pagehide", () => pause(false));
   window.BirthdayMusic = Object.freeze({
     startFromGesture: () => start(false),
+    pauseForMic: () => pause(false, "吹灭蜡烛后,点拆礼物继续听生日音乐"),
     toggle,
     stop: () => pause(true)
   });
-  render("点击开始抽签,一起听生日音乐");
+  render("点一下,一起听生日音乐");
 })();

@@ -8,13 +8,63 @@
     <meta name="description" content="一只小橘猫,带着一份认真的生日祝福.ZYJ,生日快乐.">
     <title>生日快乐 ZYJ. | 一只橘猫的小惊喜</title>
     <link rel="icon" type="image/svg+xml" href="assets/paw.svg">
-    <link rel="stylesheet" href="styles.css?v=20261123-1">
-    <script src="music.js?v=20261123-1" defer></script>
-    <script src="app.js?v=20261123-1" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20261123-2">
+    <link rel="stylesheet" href="intro.css?v=20261123-2">
+    <script src="music.js?v=20261123-2" defer></script>
+    <script src="app.js?v=20261123-2" defer></script>
+    <script src="intro.js?v=20261123-2" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到生日祝福</a>
     <div class="confetti" id="confetti" aria-hidden="true"></div>
+    <button class="music-toggle" id="music-toggle" type="button" aria-pressed="false" hidden>播放音乐</button>
+    <span class="sr-only" id="music-status" role="status"></span>
+    <section class="gift-intro" id="gift-intro" aria-labelledby="intro-title" tabindex="-1" hidden>
+      <div class="intro-topline">
+        <span><img src="assets/paw.svg" width="24" height="24" alt=""> 一只橘猫的小惊喜</span>
+        <time data-date datetime="2026-12-03">2026.12.03</time>
+      </div>
+      <div class="intro-scene">
+        <p class="intro-eyebrow">给 <span data-recipient>ZYJ</span> 的生日仪式</p>
+        <h1 class="intro-title" id="intro-title">先许一个生日愿望.</h1>
+        <p class="intro-description" id="intro-description">把想要的好事放在心里,再轻轻吹灭蜡烛.</p>
+
+        <div class="intro-cake-step" id="intro-cake-step">
+          <div class="intro-cake-art" id="intro-cake-art" aria-hidden="true">
+            <i class="intro-spark intro-spark-one"></i><i class="intro-spark intro-spark-two"></i>
+            <div class="intro-candle"><i class="intro-flame"></i><i class="intro-wick"></i><i class="intro-smoke"></i></div>
+            <div class="intro-cake-top"></div>
+            <div class="intro-cake-body"><span></span><span></span><span></span><img src="assets/paw.svg" width="38" height="38" alt=""></div>
+            <div class="intro-cake-bottom"></div><div class="intro-cake-plate"></div>
+          </div>
+          <p class="intro-scene-status" id="intro-cake-status" role="status" aria-live="polite">愿望许好了吗?</p>
+          <div class="intro-actions">
+            <button class="primary-button" id="intro-blow" type="button">吹灭蜡烛</button>
+            <button class="intro-secondary" id="intro-microphone" type="button" aria-describedby="intro-microphone-note">对着手机吹</button>
+          </div>
+          <p class="intro-microphone-note" id="intro-microphone-note">吹气感应需要麦克风,仅检测音量,不录音或上传.也可以直接点一下吹灭.</p>
+        </div>
+
+        <div class="intro-gift-step" id="intro-gift-step" hidden>
+          <div class="intro-gift-art" id="intro-gift-art" aria-hidden="true">
+            <i class="intro-spark intro-spark-one"></i><i class="intro-spark intro-spark-two"></i>
+            <div class="intro-gift-shadow"></div>
+            <div class="intro-gift-glow"></div>
+            <div class="intro-gift-body"><img src="assets/paw.svg" width="43" height="43" alt=""></div>
+            <div class="intro-gift-lid"><i class="intro-bow intro-bow-left"></i><i class="intro-bow intro-bow-right"></i></div>
+            <span class="intro-gift-surprise">生日快乐!</span>
+          </div>
+          <p class="intro-scene-status" id="intro-gift-status" role="status" aria-live="polite">愿望收好了,接下来拆开这份小礼物.</p>
+          <button class="primary-button" id="intro-unwrap" type="button">拆开礼物</button>
+          <button class="primary-button" id="intro-enter" type="button" hidden>打开生日祝福</button>
+        </div>
+
+        <ol class="intro-route" aria-label="生日惊喜的三个步骤">
+          <li id="intro-route-wish" aria-current="step">许个愿</li><li id="intro-route-gift">拆礼物</li><li id="intro-route-wishes">收祝福</li>
+        </ol>
+        <button class="intro-skip" id="intro-skip" type="button">直接看祝福</button>
+      </div>
+    </section>
     <div class="page-shell">
       <header class="masthead">
         <a class="wordmark" href="#main" aria-label="一只橘猫的小惊喜,回到顶部">
@@ -23,8 +73,6 @@
         </a>
         <div class="masthead-tools">
           <time class="date-stamp" data-date datetime="2026-12-03">2026.12.03</time>
-          <button class="music-toggle" id="music-toggle" type="button" aria-pressed="false" hidden>播放音乐</button>
-          <span class="sr-only" id="music-status" role="status"></span>
         </div>
       </header>
 
@@ -32,7 +80,7 @@
         <section class="hero" aria-labelledby="birthday-title">
           <div class="hero-copy">
             <p class="eyebrow">今天,把祝福送给你</p>
-            <h1 id="birthday-title">生日快乐<span class="recipient-line"><span data-recipient>ZYJ</span><span class="title-dot">.</span></span></h1>
+            <h1 id="birthday-title" tabindex="-1">生日快乐<span class="recipient-line"><span data-recipient>ZYJ</span><span class="title-dot">.</span></span></h1>
             <p class="opening" data-opening>这只小橘猫,替我送来一点生日的好心情.</p>
             <a class="primary-button" id="open-note" href="#letter">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5 12 13l8-5.5M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 17V7A1.5 1.5 0 0 1 5 5.5Z"/></svg>
