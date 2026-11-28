@@ -73,7 +73,7 @@
     closeMicrophoneContext(oldContext);
     microphoneButton.disabled = stage !== "candle";
     if (wasActive || stage !== "candle") {
-      microphoneButton.textContent = "许好愿望,开始吹蜡烛";
+      microphoneButton.textContent = "愿望许好了,吹蜡烛";
       cakeStatus.removeAttribute("data-mic-state");
     }
     if (breathMeter) breathMeter.hidden = true;
@@ -176,7 +176,7 @@
     cakeStep.hidden = true;
     giftStep.hidden = false;
     title.textContent = "这份礼物,等你拆开.";
-    description.textContent = "一点小惊喜,藏在里面.";
+    description.textContent = "一份小惊喜,就藏在里面.";
     giftStatus.textContent = "按住小爪印,沿虚线向右拖动.";
     setTearProgress(0);
     releaseTearPointer();
@@ -192,7 +192,7 @@
     stopMicrophone();
     cakeArt.classList.add("is-blown");
     intro.classList.add("is-wish-complete");
-    cakeStatus.textContent = "蜡烛吹灭啦.愿你许下的愿望,都慢慢实现.";
+    cakeStatus.textContent = "蜡烛吹灭啦.刚刚许下的心愿,都会慢慢向你靠近.";
     blowButton.disabled = true;
     blowButton.setAttribute("aria-label", "愿望已收好");
     transitionTimer = window.setTimeout(showGift, reducedMotion.matches ? 100 : 1800);

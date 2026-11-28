@@ -11,8 +11,8 @@
     <link rel="stylesheet" href="styles.css?v=20261123-8">
     <link rel="stylesheet" href="intro.css?v=20261123-8">
     <script src="music.js?v=20261123-8" defer></script>
-    <script src="app.js?v=20261123-8" defer></script>
-    <script src="intro.js?v=20261123-8" defer></script>
+    <script src="app.js?v=20261128-copy" defer></script>
+    <script src="intro.js?v=20261128-copy" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到生日祝福</a>
@@ -38,14 +38,14 @@
             <div class="intro-cake-bottom"></div><div class="intro-cake-plate"></div>
             <button class="intro-blow-hotspot" id="intro-blow" type="button" aria-label="吹灭蜡烛" disabled><span class="sr-only">吹灭蜡烛</span></button>
           </div>
-          <p class="intro-scene-status" id="intro-cake-status" role="status" aria-live="polite">许好愿望后,点下面的按钮开始.</p>
+          <p class="intro-scene-status" id="intro-cake-status" role="status" aria-live="polite">想好愿望后,点下面开始.</p>
           <div class="intro-actions">
-            <button class="primary-button intro-start-blowing" id="intro-microphone" type="button" aria-describedby="intro-microphone-note">许好愿望,开始吹蜡烛</button>
+            <button class="primary-button intro-start-blowing" id="intro-microphone" type="button" aria-describedby="intro-microphone-note">愿望许好了,吹蜡烛</button>
           </div>
           <div class="intro-breath-slot">
             <div class="intro-breath-meter" id="intro-breath-meter" role="progressbar" aria-label="吹气音量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden><span id="intro-breath-level"></span></div>
           </div>
-          <p class="intro-microphone-note" id="intro-microphone-note">随后请允许麦克风,再轻轻吹一口气.吹气时音乐会轻一点,仅检测音量,不录音或上传.</p>
+          <p class="intro-microphone-note" id="intro-microphone-note">点击后请允许使用麦克风,再轻轻吹一口气.期间音乐会放轻,仅感应音量,不会录音或上传.</p>
         </div>
 
         <div class="intro-gift-step" id="intro-gift-step" hidden>
@@ -85,7 +85,7 @@
           <div class="hero-copy">
             <p class="eyebrow">今天,把祝福送给你</p>
             <h1 id="birthday-title" tabindex="-1">生日快乐<span class="recipient-line"><span data-recipient>ZYJ</span><span class="title-dot">.</span></span></h1>
-            <p class="opening" data-opening>这只小橘猫,替我送来一点生日的好心情.</p>
+            <p class="opening" data-opening>这只小橘猫,替我捎来一份生日的好心情.</p>
             <a class="primary-button" id="open-note" href="#letter">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5 12 13l8-5.5M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 17V7A1.5 1.5 0 0 1 5 5.5Z"/></svg>
               <span id="hero-action-label">打开生日小纸条</span>
@@ -97,7 +97,7 @@
             <div class="cat-frame">
               <img class="orange-cat" src="assets/orange-cat.svg" width="450" height="420" alt="一只眯着眼睛笑的橘猫,额头和脸颊有深橘色虎斑,口鼻是奶白色.">
             </div>
-            <p class="cat-caption"><span aria-hidden="true">喵</span> 生日祝福,已送到.</p>
+            <p class="cat-caption"><span aria-hidden="true">喵~</span> 你的生日祝福已送达.</p>
           </div>
         </section>
 
@@ -115,7 +115,7 @@
               </div>
               <p class="fortune-progress" id="fortune-progress">已收下 0 / 5 份祝福</p>
               <button class="primary-button fortune-draw" id="draw-fortune" type="button" aria-controls="fortune-result">抽一支生日签</button>
-              <p class="fortune-music-hint">点一下,让祝福和生日旋律一起到来.</p>
+              <p class="fortune-music-hint">点一下,让好运和生日歌一起响起来.</p>
             </div>
             <div class="fortune-paper" id="fortune-result" role="status" aria-live="polite" aria-atomic="true">
               <span class="fortune-stamp" id="fortune-stamp">生日限定</span>
@@ -145,14 +145,14 @@
         <section class="letter-section" id="letter" aria-labelledby="letter-title">
           <div class="section-intro">
             <p class="eyebrow">还有几句话,想送给你</p>
-            <h2 id="letter-title">一张小纸条,一份认真祝福.</h2>
+            <h2 id="letter-title">一张小纸条,一份认真的祝福.</h2>
           </div>
           <article class="letter-card" id="letter-card">
             <div class="letter-cover">
               <div class="envelope-seal" aria-hidden="true"><img src="assets/paw.svg" width="38" height="38" alt=""></div>
               <div class="letter-address">
                 <span class="letter-to">给 <span data-recipient>ZYJ</span></span>
-                <span class="letter-caption">今天的你,值得收下很多很多祝福.</span>
+                <span class="letter-caption">今天的你,值得收下很多很多的喜欢与祝福.</span>
               </div>
               <button class="note-toggle" id="note-toggle" type="button" aria-expanded="true" aria-controls="letter-body" hidden>把小纸条收好</button>
             </div>
@@ -160,9 +160,9 @@
               <div class="letter-body-inner">
                 <p class="letter-greeting"><span data-recipient>ZYJ</span>,生日快乐!</p>
                 <div id="message-paragraphs">
-                  <p>愿新的一岁里,你常常遇见让人开心的小事:好吃的一餐,好看的风景,还有突然冒出来的一点好运.</p>
-                  <p>忙的时候,也记得给自己留一点休息的时间.喜欢的事情可以慢慢做,想去的地方也可以慢慢抵达.</p>
-                  <p>希望这只小橘猫,能陪你把平凡的日子过得更有意思.今天就安心收下祝福,开开心心地过生日吧.</p>
+                  <p>往后的日子里,愿你常常遇见让人开心的小事:合胃口的一餐,好看的风景,还有突然冒出来的一点好运.</p>
+                  <p>忙的时候,也记得给自己留一段喘息的时间.喜欢的事情可以慢慢做,想去的地方也可以慢慢抵达.</p>
+                  <p>希望这只小橘猫,能陪你把平凡的日子过得更有意思.今天就安心收下祝福,自在又开心地过生日吧.</p>
                 </div>
                 <p class="letter-signoff" data-signoff>祝你新的一岁,一切都好.</p>
                 <time class="letter-date" data-date datetime="2026-12-03">2026.12.03</time>
@@ -183,7 +183,7 @@
 
       <footer class="footer">
         <img src="assets/paw.svg" width="24" height="24" alt="">
-        <p>愿这只小猫,把一点好心情留在你身边.</p>
+        <p>愿这只小橘猫,把好心情一直留在你身边.</p>
         <span>给 <span data-recipient>ZYJ</span> 的生日祝福</span>
       </footer>
     </div>
